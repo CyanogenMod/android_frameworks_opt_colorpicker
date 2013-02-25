@@ -121,7 +121,12 @@ public class ColorPickerDialog extends DialogFragment implements OnColorSelected
             listener.onColorSelected(color);
         }
 
-        mSelectedColor = color;
+        if (color != mSelectedColor) {
+            mSelectedColor = color;
+            // Redraw palette to show checkmark on newly selected color before dismissing.
+            mPalette.drawPalette(mColors, mSelectedColor);
+        }
+
         dismiss();
     }
 
