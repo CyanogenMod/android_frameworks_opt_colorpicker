@@ -16,5 +16,6 @@
 <resources>
 
     <string name="app_name">Color Picker</string>
+    <string name="color_picker_default_title">Select a Color</string>
 
 </resources>
