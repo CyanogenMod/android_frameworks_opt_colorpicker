@@ -30,7 +30,6 @@ import android.widget.ImageView;
  * Creates a circular swatch of a specified color.  Adds a checkmark if marked as checked.
  */
 public class ColorPickerSwatch extends FrameLayout implements View.OnClickListener {
-
     private int mColor;
     private ImageView mSwatchImage;
     private ImageView mCheckmarkImage;

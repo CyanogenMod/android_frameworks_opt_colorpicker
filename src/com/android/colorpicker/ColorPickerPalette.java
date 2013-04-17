@@ -17,6 +17,7 @@
 package com.android.colorpicker;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,9 @@ import com.android.colorpicker.ColorPickerSwatch.OnColorSelectedListener;
 public class ColorPickerPalette extends TableLayout {
 
     public OnColorSelectedListener mOnColorSelectedListener;
+
+    private String mDescription;
+    private String mDescriptionSelected;
 
     private int mSwatchLength;
     private int mMarginSize;
@@ -52,14 +56,18 @@ public class ColorPickerPalette extends TableLayout {
      */
     public void init(int size, int columns, OnColorSelectedListener listener) {
         mNumColumns = columns;
+        Resources res = getResources();
         if (size == ColorPickerDialog.SIZE_LARGE) {
-            mSwatchLength = getResources().getDimensionPixelSize(R.dimen.color_swatch_large);
-            mMarginSize = getResources().getDimensionPixelSize(R.dimen.color_swatch_margins_large);
+            mSwatchLength = res.getDimensionPixelSize(R.dimen.color_swatch_large);
+            mMarginSize = res.getDimensionPixelSize(R.dimen.color_swatch_margins_large);
         } else {
-            mSwatchLength = getResources().getDimensionPixelSize(R.dimen.color_swatch_small);
-            mMarginSize = getResources().getDimensionPixelSize(R.dimen.color_swatch_margins_small);
+            mSwatchLength = res.getDimensionPixelSize(R.dimen.color_swatch_small);
+            mMarginSize = res.getDimensionPixelSize(R.dimen.color_swatch_margins_small);
         }
         mOnColorSelectedListener = listener;
+
+        mDescription = res.getString(R.string.color_swatch_description);
+        mDescriptionSelected = res.getString(R.string.color_swatch_description_selected);
     }
 
     private TableRow createTableRow() {
@@ -74,19 +82,25 @@ public class ColorPickerPalette extends TableLayout {
      * Adds swatches to table in a serpentine format.
      */
     public void drawPalette(int[] colors, int selectedColor) {
-
         if (colors == null) {
             return;
         }
 
         this.removeAllViews();
+        int tableElements = 0;
         int rowElements = 0;
         int rowNumber = 0;
 
         // Fills the table with swatches based on the array of colors.
         TableRow row = createTableRow();
-        for (int color : colors)  {
-            addSwatchToRow(row, createColorSwatch(color, selectedColor), rowNumber);
+        for (int color : colors) {
+            tableElements++;
+
+            View colorSwatch = createColorSwatch(color, selectedColor);
+            setSwatchDescription(rowNumber, tableElements, rowElements, color == selectedColor,
+                    colorSwatch);
+            addSwatchToRow(row, colorSwatch, rowNumber);
+
             rowElements++;
             if (rowElements == mNumColumns) {
                 addView(row);
@@ -116,6 +130,33 @@ public class ColorPickerPalette extends TableLayout {
         } else {
             row.addView(swatch, 0);
         }
+    }
+
+    /**
+     * Add a content description to the specified swatch view. Because the colors get added in a
+     * snaking form, every other row will need to compensate for the fact that the colors are added
+     * in an opposite direction from their left->right/top->bottom order, which is how the system
+     * will arrange them for accessibility purposes.
+     */
+    private void setSwatchDescription(int rowNumber, int index, int rowElements, boolean selected,
+            View swatch) {
+        int accessibilityIndex;
+        if (rowNumber % 2 == 0) {
+            // We're in a regular-ordered row
+            accessibilityIndex = index;
+        } else {
+            // We're in a backwards-ordered row.
+            int rowMax = ((rowNumber + 1) * mNumColumns);
+            accessibilityIndex = rowMax - rowElements;
+        }
+
+        String description;
+        if (selected) {
+            description = String.format(mDescriptionSelected, accessibilityIndex);
+        } else {
+            description = String.format(mDescription, accessibilityIndex);
+        }
+        swatch.setContentDescription(description);
     }
 
     /**
