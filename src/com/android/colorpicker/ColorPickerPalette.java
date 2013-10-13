@@ -124,7 +124,7 @@ public class ColorPickerPalette extends TableLayout {
      * Appends a swatch to the end of the row for even-numbered rows (starting with row 0),
      * to the beginning of a row for odd-numbered rows.
      */
-    private void addSwatchToRow(TableRow row, View swatch, int rowNumber) {
+    private static void addSwatchToRow(TableRow row, View swatch, int rowNumber) {
         if (rowNumber % 2 == 0) {
             row.addView(swatch);
         } else {
