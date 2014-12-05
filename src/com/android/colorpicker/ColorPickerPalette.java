@@ -82,6 +82,13 @@ public class ColorPickerPalette extends TableLayout {
      * Adds swatches to table in a serpentine format.
      */
     public void drawPalette(int[] colors, int selectedColor) {
+        drawPalette(colors, selectedColor, null);
+    }
+
+    /**
+     * Adds swatches to table in a serpentine format.
+     */
+    public void drawPalette(int[] colors, int selectedColor, String[] colorContentDescriptions) {
         if (colors == null) {
             return;
         }
@@ -98,7 +105,7 @@ public class ColorPickerPalette extends TableLayout {
 
             View colorSwatch = createColorSwatch(color, selectedColor);
             setSwatchDescription(rowNumber, tableElements, rowElements, color == selectedColor,
-                    colorSwatch);
+                    colorSwatch, colorContentDescriptions);
             addSwatchToRow(row, colorSwatch, rowNumber);
 
             rowElements++;
@@ -139,22 +146,26 @@ public class ColorPickerPalette extends TableLayout {
      * will arrange them for accessibility purposes.
      */
     private void setSwatchDescription(int rowNumber, int index, int rowElements, boolean selected,
-            View swatch) {
-        int accessibilityIndex;
-        if (rowNumber % 2 == 0) {
-            // We're in a regular-ordered row
-            accessibilityIndex = index;
-        } else {
-            // We're in a backwards-ordered row.
-            int rowMax = ((rowNumber + 1) * mNumColumns);
-            accessibilityIndex = rowMax - rowElements;
-        }
-
+            View swatch, String[] contentDescriptions) {
         String description;
-        if (selected) {
-            description = String.format(mDescriptionSelected, accessibilityIndex);
+        if (contentDescriptions != null && contentDescriptions.length > index) {
+            description = contentDescriptions[index];
         } else {
-            description = String.format(mDescription, accessibilityIndex);
+            int accessibilityIndex;
+            if (rowNumber % 2 == 0) {
+                // We're in a regular-ordered row
+                accessibilityIndex = index;
+            } else {
+                // We're in a backwards-ordered row.
+                int rowMax = ((rowNumber + 1) * mNumColumns);
+                accessibilityIndex = rowMax - rowElements;
+            }
+
+            if (selected) {
+                description = String.format(mDescriptionSelected, accessibilityIndex);
+            } else {
+                description = String.format(mDescription, accessibilityIndex);
+            }
         }
         swatch.setContentDescription(description);
     }
