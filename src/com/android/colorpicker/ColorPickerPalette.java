@@ -101,13 +101,12 @@ public class ColorPickerPalette extends TableLayout {
         // Fills the table with swatches based on the array of colors.
         TableRow row = createTableRow();
         for (int color : colors) {
-            tableElements++;
-
             View colorSwatch = createColorSwatch(color, selectedColor);
             setSwatchDescription(rowNumber, tableElements, rowElements, color == selectedColor,
                     colorSwatch, colorContentDescriptions);
             addSwatchToRow(row, colorSwatch, rowNumber);
 
+            tableElements++;
             rowElements++;
             if (rowElements == mNumColumns) {
                 addView(row);
@@ -154,7 +153,7 @@ public class ColorPickerPalette extends TableLayout {
             int accessibilityIndex;
             if (rowNumber % 2 == 0) {
                 // We're in a regular-ordered row
-                accessibilityIndex = index;
+                accessibilityIndex = index + 1;
             } else {
                 // We're in a backwards-ordered row.
                 int rowMax = ((rowNumber + 1) * mNumColumns);
